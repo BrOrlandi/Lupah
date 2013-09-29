@@ -306,7 +306,7 @@ function plotMapData(firsttime){
 	//console.log(icones);
 	
 	//var infowindow = new google.maps.InfoWindow();
-	var infoBubble = new InfoBubble({borderRadius: 0,maxWidth:350,minWidth:300,maxHeight:500});
+	var infoBubble = new InfoBubble({borderRadius: 0,maxWidth:350,minWidth:300,maxHeight:500,borderColor:'#1a8989', backgroundColor:'#3caaaa'});
 	for(var i=0;i<pontos.length;i++){
 		var icone = icones[pontos[i][0]];
 		markers[i] = new google.maps.Marker({
@@ -322,7 +322,8 @@ function plotMapData(firsttime){
     	
     	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
     	
-    	var contentInfo = '<h2 id="titulo">'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+    	var contentInfo = '<h2 id="titulo" style="color:#fff">'+ pontos[i][1] + '</h2><p style="color:#fff">Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+    	'<div style="margin: 0 auto; text-align: center;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
     	'<fieldset class="ui-grid-b">' +
     	'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
         '<div class="ui-block-b"><a href="'+pontos[i][15]+'" style="text-decoration: none;'+ (pontos[i][15] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>' +
