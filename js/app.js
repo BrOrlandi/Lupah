@@ -305,7 +305,8 @@ function plotMapData(firsttime){
 	//console.log(pontos);
 	//console.log(icones);
 	
-	var infowindow = new google.maps.InfoWindow();
+	//var infowindow = new google.maps.InfoWindow();
+	var infoBubble = new InfoBubble({borderRadius: 0,maxWidth:350,minWidth:300,maxHeight:500});
 	for(var i=0;i<pontos.length;i++){
 		var icone = icones[pontos[i][0]];
 		markers[i] = new google.maps.Marker({
@@ -321,16 +322,20 @@ function plotMapData(firsttime){
     	
     	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
     	
-    	var contentInfo = '<div id="content"><h2>'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
-    	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
-    	'<a href="'+pontos[i][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
-    	'<a href="tel:'+pontos[i][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[i][12] +'</a>  ' + 
-    	'</div>';
+    	var contentInfo = '<h2 id="titulo">'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+    	'<fieldset class="ui-grid-b">' +
+    	'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
+        '<div class="ui-block-b"><a href="'+pontos[i][15]+'" style="text-decoration: none;'+ (pontos[i][15] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>' +
+        '<div class="ui-block-c"><a href="tel:'+pontos[i][12]+'" style="text-decoration: none;'+ (pontos[i][12] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/telefone.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'Telefone') +'</div></a></div>' + 
+        '</fieldset>';        
     						
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
-				infowindow.setContent(content);
-				infowindow.open(google_map,marker);
+				//infowindow.setContent(content);
+				//infowindow.open(google_map,marker);
+				
+				infoBubble.setContent(content);
+				infoBubble.open(google_map,marker);
 			};
 		})(markers[i],contentInfo));
 			//markers[i].infowindow.open(google_map,markers[i].marker);

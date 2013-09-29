@@ -69,3 +69,98 @@ text-shadow: none;}
 }
 
 */
+
+.test{
+	background-image: url("../imgs/site.png");
+	font-size: x-large;
+	font-family: "Comic Sans MS";
+	color: #FF0000;
+}
+
+.ui-icon-rota{
+	background-image: url("../imgs/rota.jpg");
+	background-size: 18px 18px;
+}
+
+.ui-icon-telefone{
+	background-image: url("../imgs/telefone.png");
+	background-size: 18px 18px;
+}
+
+.ui-icon-site{
+	background-image: url("../imgs/site.png");
+	background-size: 18px 18px;
+}
+
+.infobutton {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background-color:#ededed;
+	-webkit-border-top-left-radius:0px;
+	-moz-border-radius-topleft:0px;
+	border-top-left-radius:0px;
+	-webkit-border-top-right-radius:0px;
+	-moz-border-radius-topright:0px;
+	border-top-right-radius:0px;
+	-webkit-border-bottom-right-radius:0px;
+	-moz-border-radius-bottomright:0px;
+	border-bottom-right-radius:0px;
+	-webkit-border-bottom-left-radius:0px;
+	-moz-border-radius-bottomleft:0px;
+	border-bottom-left-radius:0px;
+	text-indent:0;
+	border:1px solid #d6d6d6;
+	/*display:inline-block;*/
+	color:#525252;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:italic;
+	/*height:65px;*/
+	/*line-height:65px;*/
+	/*width:131px;*/
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #ffffff;
+	padding: 15px;
+}
+.infobutton:hover {
+	background-color:#dfdfdf;
+}.infobutton:active {
+	position:relative;
+	top:1px;
+}
+.infobutton-disabled {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background-color:#ededed;
+	-webkit-border-top-left-radius:0px;
+	-moz-border-radius-topleft:0px;
+	border-top-left-radius:0px;
+	-webkit-border-top-right-radius:0px;
+	-moz-border-radius-topright:0px;
+	border-top-right-radius:0px;
+	-webkit-border-bottom-right-radius:0px;
+	-moz-border-radius-bottomright:0px;
+	border-bottom-right-radius:0px;
+	-webkit-border-bottom-left-radius:0px;
+	-moz-border-radius-bottomleft:0px;
+	border-bottom-left-radius:0px;
+	text-indent:0;
+	border:1px solid #dcdcdc;
+	/*display:inline-block;*/
+	color:#b5b5b5;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:italic;
+	/*height:65px;*/
+	/*line-height:65px;*/
+	/*width:131px;*/
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #ffffff;
+	padding: 15px;
+}
