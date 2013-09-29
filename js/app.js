@@ -318,20 +318,9 @@ function plotMapData(firsttime){
 			map: google_map
 		});
 		console.log(markers[i]);
-		
-		//var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
-    	//					'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
-    	
-    	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
-    	
-    	var contentInfo = '<h2 id="titulo" style="color:#fff">'+ pontos[i][1] + '</h2><p style="color:#fff">Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
-    	'<div style="margin: 0 auto; text-align: center;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
-    	'<fieldset class="ui-grid-b">' +
-    	'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
-        '<div class="ui-block-b"><a href="'+pontos[i][15]+'" style="text-decoration: none;'+ (pontos[i][15] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>' +
-        '<div class="ui-block-c"><a href="tel:'+pontos[i][12]+'" style="text-decoration: none;'+ (pontos[i][12] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/telefone.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'Telefone') +'</div></a></div>' + 
-        '</fieldset>';        
-    						
+	
+    	var contentInfo = infoWindowContent(pontos,i); 	
+    	      
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
 				//infowindow.setContent(content);
@@ -346,6 +335,23 @@ function plotMapData(firsttime){
 	stopLoadingMessage();
 	console.log('end of plotMapData, '+ pontos.length + ' points.');
 }
+
+function infoWindowContent(pontos,i){
+		//var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
+    	//					'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
+    	
+    		var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
+    	
+	    	var contentInfo = '<h2 id="titulo" style="color:#fff">'+ pontos[i][1] + '</h2><p style="color:#fff">Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+	    	'<div style="margin: 0 auto; text-align: center;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
+	    	'<fieldset class="ui-grid-b">' +
+	    	'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
+	        '<div class="ui-block-b"><a href="'+pontos[i][15]+'" style="text-decoration: none;'+ (pontos[i][15] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>' +
+	        '<div class="ui-block-c"><a href="tel:'+pontos[i][12]+'" style="text-decoration: none;'+ (pontos[i][12] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/telefone.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'Telefone') +'</div></a></div>' + 
+	        '</fieldset><div class="fb-comments" data-href="http://www.lupah.org/?id='+ i +'" data-width="300"></div>';  
+        	return contentInfo;
+    	};
+
 
 function criarMapa(){
 	console.log('criarMapa');
@@ -410,18 +416,8 @@ function resultSelection_onClick(liElement){
         window.alert('infowindow');
         infoBubble = new google.maps.InfoWindow();
       }*/
-	 
-	var i = liElement.value;
-	   
-   	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
-	
-	var contentInfo = '<h2 id="titulo" style="color:#fff">'+ pontos[i][1] + '</h2><p style="color:#fff">Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
-	'<div style="margin: 0 auto; text-align: center;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
-	'<fieldset class="ui-grid-b">' +
-	'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
-	'<div class="ui-block-b"><a href="'+pontos[i][15]+'" style="text-decoration: none;'+ (pontos[i][15] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>' +
-	'<div class="ui-block-c"><a href="tel:'+pontos[i][12]+'" style="text-decoration: none;'+ (pontos[i][12] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/telefone.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'Telefone') +'</div></a></div>' + 
-	'</fieldset>';  
+     
+	var contentInfo = infoWindowContent(pontos,liElement.value); 
           
     infoBubble.setContent(contentInfo);
     infoBubble.open(google_map, markers[liElement.value]);
