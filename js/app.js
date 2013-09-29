@@ -20,6 +20,8 @@ var currentPositionData; // objeto posição da posição atual
 var currentPositionMarker; // marcador que mostra a posição atual do GPS no mapa.
 var isWatching = false; // indica se esta lendo a posição do usuario.
 
+var infoBubble;
+
 //var config_followPos = false; // desnecessário implementar.
 
 //é chamada antes da pagina carregar.
@@ -306,7 +308,7 @@ function plotMapData(firsttime){
 	//console.log(icones);
 	
 	//var infowindow = new google.maps.InfoWindow();
-	var infoBubble = new InfoBubble({borderRadius: 0,maxWidth:350,minWidth:300,maxHeight:500,borderColor:'#1a8989', backgroundColor:'#3caaaa'});
+	infoBubble = new InfoBubble({borderRadius: 0,maxWidth:350,minWidth:300,maxHeight:500,borderColor:'#1a8989', backgroundColor:'#3caaaa'});
 	for(var i=0;i<pontos.length;i++){
 		var icone = icones[pontos[i][0]];
 		markers[i] = new google.maps.Marker({
@@ -345,7 +347,6 @@ function plotMapData(firsttime){
 	console.log('end of plotMapData, '+ pontos.length + ' points.');
 }
 
-
 function criarMapa(){
 	console.log('criarMapa');
 
@@ -374,4 +375,58 @@ function getRealContentHeight() {
 		content_height -= (coheight - cheight);
 	}
 	return content_height;
+}
+
+function searchByName(nameTextInput){
+  var icones = JSON.parse(localStorage.getItem('Icones'));
+  var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
+  var j = 0;
+   
+    $('#resultsList').empty(); // empties resultsList (because of the last insertion)
+  
+  for(var i = 0; i < pontos.length && nameTextInput.value.length > 1; i++){ // only starts searching if the word has more than 2 letters
+     if(pontos[i][1].toLowerCase().indexOf(nameTextInput.value.toLowerCase()) != -1){
+       
+       $('#resultsList').append('<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#">' + pontos[i][1] + '</a></li>');
+    }
+  }  
+  
+  $("#resultsList").listview("refresh");
+  $('#resultSelection').popup({ theme: "a" });
+     
+     theme_Class = 'solid';
+}
+
+
+function resultSelection_onClick(liElement){
+  if(theme_Class === 'solid'){
+    $('#resultSelection').popup({ theme: "none" });
+    theme_Class = 'translucent';
+      var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+      google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
+      google_map.setZoom(13);
+      /*
+      if(infoBubble == undefined){
+        window.alert('infowindow');
+        infoBubble = new google.maps.InfoWindow();
+      }*/
+	 
+	var i = liElement.value;
+	   
+   	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
+	
+	var contentInfo = '<h2 id="titulo" style="color:#fff">'+ pontos[i][1] + '</h2><p style="color:#fff">Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+	'<div style="margin: 0 auto; text-align: center;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
+	'<fieldset class="ui-grid-b">' +
+	'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
+	'<div class="ui-block-b"><a href="'+pontos[i][15]+'" style="text-decoration: none;'+ (pontos[i][15] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>' +
+	'<div class="ui-block-c"><a href="tel:'+pontos[i][12]+'" style="text-decoration: none;'+ (pontos[i][12] != '' ? '' : ' cursor: default;') +'" target="_blank"><div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/telefone.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'Telefone') +'</div></a></div>' + 
+	'</fieldset>';  
+          
+    infoBubble.setContent(contentInfo);
+    infoBubble.open(google_map, markers[liElement.value]);
+    }else{
+      $('#resultSelection').popup({ theme: "a" });
+      theme_Class = 'solid';
+    }
 }

@@ -81,7 +81,18 @@
         </div>
 
         <div data-theme="a" data-role="footer" data-position="fixed" data-id="footer" class="ui-bar">
+            <a href="#popupBasic" data-rel="popup">Pesquisar</a>
+                <div data-role="popup" id="popupBasic" data-transition="slideup" class="ui-content" data-overlay-theme="a">
 
+                    <input id="searchTextInput" type="search" style="border-left-width: 20px; border-right-width: 20px" onkeyup="searchByName(searchTextInput)">
+                    </input>
+                    <div data-role="button" data-inline="true" style="{margin: 30px}">
+                        <a href="#resultSelection" data-rel="popup"> Pesquisar </a>
+                    </div>
+                    <div data-transition="slideup" data-role="popup" id="resultSelection" class="ui-content" onclick="resultSelection_OnClick()">
+                        <ul id="resultsList" data-role="listview" data-theme="g"></ul>
+                    </div>
+                </div>
         </div>
     </div>
     
