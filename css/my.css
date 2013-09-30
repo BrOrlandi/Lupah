@@ -124,6 +124,7 @@ text-shadow: none;}
 	text-align:center;
 	text-shadow:1px 1px 0px #ffffff;
 	padding: 15px;
+	cursor: pointer;
 }
 .infobutton:hover {
 	background-color:#dfdfdf;
@@ -132,6 +133,7 @@ text-shadow: none;}
 	top:1px;
 }
 .infobutton-disabled {
+	cursor: default;
 	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
 	box-shadow:inset 0px 1px 0px 0px #ffffff;
