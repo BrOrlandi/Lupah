@@ -354,7 +354,8 @@ function infoWindowContent(pontos,i){
 	//var url_rota = 'http://maps.google.com/maps?saddr='+ lat +','+ lng +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
 	
 	var contentInfo = '<h2 id="titulo" style="color:#fff">'+ pontos[i][1] + '</h2><p style="color:#fff">' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
-	'<div style="margin: 0 auto; text-align: center;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
+	//'<div style="margin: 0 auto; text-align: center; cursor: pointer;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
+	'<div style="margin: 0 auto; text-align: center; cursor: pointer;" onclick="streetViewClick('+pontos[i][3]+','+ pontos[i][4] +');"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></div>' +
 	'<fieldset class="ui-grid-b">' +
 	//'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
     '<div class="ui-block-a"><div class="infobutton rota-button" onclick="rotaClick('+ pontos[i][3] +','+ pontos[i][4] +');"><img src="imgs/rota.png" width="30px" height="30px"/><br>ROTA</div></div>' +
@@ -371,6 +372,13 @@ function rotaClick(lat,lng){
 	//console.log(lat+','+lng);
 	var win=window.open('http://maps.google.com/maps?saddr='+ slat +','+ slng +'&daddr='+ lat+','+ lng, '_blank');
   	//win.focus();
+}
+
+
+function streetViewClick(lat,lng){
+	var st = google_map.getStreetView();
+	st.setPosition(new google.maps.LatLng(lat,lng));
+	st.setVisible(true);
 }
 
 function criarMapa(){
