@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<!-- manifest="lupah.appcache" -->
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<meta charset="UTF-8">
 	
@@ -17,7 +18,7 @@
     <!-- debug mobi id: 4b8f6096-e437-bb8d-5c4f-ef3f4415a7d6 -->
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#4b8f6096-e437-bb8d-5c4f-ef3f4415a7d6"></script> -->
 
-    <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDSd228BhVAFTTbr1cKAnAxvmlbrvKmiTY&sensor=false"></script>    
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDSd228BhVAFTTbr1cKAnAxvmlbrvKmiTY&sensor=false&libraries=places"></script>    
     <link rel="stylesheet" href="css/my.css" />
     <script type="text/javascript" src="js/app.js"></script>
 
@@ -41,45 +42,16 @@
           js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=555153137866920";
           fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
-	<!--
-	    <div data-role="page" id="page1">
-        <div data-theme="a" data-role="header" data-position="fixed" data-id="header">
-            <h3>
-                Mapa Saude
-            </h3>
-        </div>
-
-        <div data-role="content" id="content">
-            <a href="#map_page" data-role="button" data-transition="slide">Go to Map</a>
-            
-        </div>
-
-        <div data-theme="a" data-role="footer" data-position="fixed" data-position="fixed" data-id="footer">
-            <h3>
-                First Page
-            </h3>
-        </div>
-        
-    </div>
-   -->
    
      
     <div data-role="page" id="map_page">
-    	
-		<div data-role="popup" id="popupMenu">
-        <ul data-role="listview" data-inset="true" style="min-width:210px;">
-            <li data-role="divider">Buscar</li>
-			<li><a href="#" data-rel="back" data-icon="search">UBS mais próxima</a></li>
-			<li><a href="#" data-rel="back" data-icon="home">UBS a partir de casa</a></li>
-			<li><a href="#" data-rel="back" data-icon="grid">Buscar todos</a></li>
-        </ul>
-		</div>
-    	
-        <div data-theme="a" data-role="header" data-position="fixed" data-id="header">
-        	<a href="#popupMenu" class="ui-icon-nodisc" data-theme="b" data-iconshadow="false" data-rel="popup" data-role="button" data-transition="slidedown" data-icon="bars" data-iconpos="notext">Menu</a>
-        	<!-- <a data-role="button" data-icon="back" data-transition="slide" data-direction="reverse" href="#" data-rel="back">Voltar</a> -->
+    	    	
+        <div data-theme="a" data-role="header" id="headerBar" data-position="fixed" data-id="header">
+        	<a href="#" onclick="centerStartButton();" class="ui-btn-left" data-theme="b" data-iconshadow="true" data-rel="popup" data-role="button"><img src="imgs/icon_partida.png" height="18" width="18"/></a>
+            <!-- <a href="#popupMenu" class="ui-icon-nodisc" data-theme="b" data-iconshadow="false" data-rel="popup" data-role="button" data-transition="slidedown" data-icon="bars" data-iconpos="notext">Menu</a> -->
+            <!-- <a data-role="button" data-icon="back" data-transition="slide" data-direction="reverse" href="#" data-rel="back">Voltar</a> -->
             <h3>LUPAH</h3>
-            <!-- <a href="#" data-role="button" data-inline="true" target="_blank" class="test">Rota</a> -->
+            <a href="#" onclick="centerPosButton();" class="ui-btn-right" data-theme="b" data-iconshadow="true" data-rel="popup" data-role="button"><img src="imgs/icon_localatual.png" height="18" width="18"/></a>
         </div>
 
         <div data-role="content" id="mapcontent">
@@ -98,27 +70,29 @@
 			
         </div>
 
-        <div data-theme="a" data-role="footer" data-position="fixed" data-id="footer" class="ui-bar">
+        <div data-theme="a" data-role="footer" data-position="fixed" data-id="footer" id="footerBar" class="ui-bar">
             <a href="#popupBasic" data-rel="popup">Pesquisar</a>
-                <div data-role="popup" id="popupBasic" data-transition="slideup" class="ui-content" data-overlay-theme="a">
+            <div data-role="popup" id="popupBasic" data-transition="slideup" class="ui-content" data-overlay-theme="a">
 
-                    <input id="searchTextInput" type="search" style="border-left-width: 20px; border-right-width: 20px" onkeyup="searchByName(searchTextInput)">
-                    </input>
-                    <div data-role="button" data-inline="true" style="{margin: 30px}">
-                        <a href="#resultSelection" data-rel="popup"> Pesquisar </a>
-                    </div>
-                    <div data-transition="slideup" data-role="popup" id="resultSelection" class="ui-content" onclick="resultSelection_OnClick()">
-                        <ul id="resultsList" data-role="listview" data-theme="g"></ul>
-                    </div>
+                <input id="searchTextInput" type="search" style="border-left-width: 20px; border-right-width: 20px" onkeyup="searchByName(searchTextInput)">
+                </input>
+                <div data-role="button" data-inline="true" style="{margin: 30px}">
+                    <a href="#resultSelection" data-rel="popup"> Pesquisar </a>
                 </div>
+                <div data-transition="slideup" data-role="popup" id="resultSelection" class="ui-content" onclick="resultSelection_OnClick()">
+                    <ul id="resultsList" data-role="listview" data-theme="g"></ul>
+                </div>
+            </div>
+            
+            <div data-role="popup" id="popupAddress" style="padding: 5px 10px;" data-transition="slidedown" class="ui-content">
+                <input id="addressInput" type="text" onkeyup="pacTest()">
+                </input>
+            </div>
         </div>
     </div>
-    
+    <!-- 
     <div data-role="page" class="myOPage" id="pageInfoWindow"> 
-<!-- This page is used to store the infoWindow data & apply styling. 
-        Once that is done, the html is copied to the google map for 
-display in an InfoWindow 
---> 
+
     <div data-role="header" data-position="fixed" class="iwTitle"> 
         <h1>InfoWindow</h1> 
     </div> 
@@ -131,7 +105,7 @@ display in an InfoWindow
             <div class="ui-block-b"><a href="https://www.google.com" data-role="button" target="_blank" data-icon="site" data-iconpos="top">Site</a></div>
             <div class="ui-block-c"><a href="tel:33335555" data-role="button" target="_blank" data-icon="telefone" data-iconpos="top">Telefone</a></div>     
         </fieldset> -->
-        <div id="content"><h2 id="titulo">Titulo</p>
+        <!-- <div id="content"><h2 id="titulo">Titulo</p>
         <fieldset class="ui-grid-b">
         <div class="ui-block-a"><a href="https://maps.google.com" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>
         <div class="ui-block-b"><a href="https://maps.google.com" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/site.png" width="30px" height="30px"/><br>Site</div></a></div>
@@ -140,7 +114,6 @@ display in an InfoWindow
         
         </div>
         </div> 
-    </div><!-- /page --> 
-        
+    </div><!-- /page -->    
 </body>
 </html>

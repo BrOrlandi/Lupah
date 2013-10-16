@@ -19,9 +19,13 @@ var geolocation_watcher; // watcher que pegar a posição do GPS a cada interval
 var currentPositionData; // objeto posição da posição atual
 var currentPositionMarker; // marcador que mostra a posição atual do GPS no mapa.
 var startPositionMarker;
+var startPositionLat;
+var startPositionLng; 
 var isWatching = false; // indica se esta lendo a posição do usuario.
 
 var infoBubble;
+
+var popupAddressOpen = false;
 
 //var config_followPos = false; // desnecessário implementar.
 
@@ -29,10 +33,10 @@ var infoBubble;
 getMetadataOnline();
 
 //phonegap
-document.addEventListener("deviceready", onDeviceReady, false);
-function onDeviceReady() {
-    //$("#orientation").html("Phonegap!");
-}
+// document.addEventListener("deviceready", onDeviceReady, false);
+// function onDeviceReady() {
+    // //$("#orientation").html("Phonegap!");
+// }
 
 $(document).on('pageshow', '#map_page', function(e, data) {
 				
@@ -61,8 +65,12 @@ $(document).on('pageshow', function(e) {
 $(window).on( "orientationchange", function( event ) {
 	if($.mobile.activePage.attr('id') == 'map_page'){
 		backupMap();
-		$.mobile.changePage('#map_page',{allowSamePageTransition : true, changeHash: false, transition: 'fade'});
+		if(popupAddressOpen){
+			alert('vai fechar');
+			$('#popupAddress').popup( "close");	
+		}
 		orientationChanged = true;
+		$.mobile.changePage('#map_page',{allowSamePageTransition : true, changeHash: false, transition: 'fade'});
 	}
 });
 
@@ -120,22 +128,64 @@ function createMarker(pos,firsttime){
 			animation: firsttime == true ? google.maps.Animation.DROP : null,
 			title: 'Você',
 			position: posLatLng,
-			icon: {fillColor: '#294aa5', strokeColor: '#00cbff', scale: 10, strokeWeight: 10, fillOpacity: 1, strokeOpacity: 0.5, path: google.maps.SymbolPath.CIRCLE},
+			//icon: {fillColor: '#294aa5', strokeColor: '#00cbff', scale: 10, strokeWeight: 10, fillOpacity: 1, strokeOpacity: 0.5, path: google.maps.SymbolPath.CIRCLE},
+			icon: {url: './imgs/icon_localatual.png', anchor: {x:25,y:25}},
 			map: google_map,
 			zIndex: 1
 		});
 	if(firsttime){
 		google_map.panTo(posLatLng);
 		google_map.setZoom(13);
-		startPositionMarker = new google.maps.Marker({
-			animation: google.maps.Animation.DROP,
+	}
+}
+
+function createStartMarker(firsttime){
+	if(firsttime){
+		startPositionLat = currentPositionData.coords.latitude;
+		startPositionLng = currentPositionData.coords.longitude;
+	}
+	startPositionMarker = new google.maps.Marker({
+			animation: firsttime == true ? google.maps.Animation.DROP : null,
 			title: 'Ponto de Partida',
-			position: posLatLng,
+			position: new google.maps.LatLng(startPositionLat,startPositionLng),
+			icon: {url: './imgs/icon_partida.png', anchor: {x:25,y:25}},//, scaledSize: new google.maps.Size(50,50)
 			draggable: true,
 			map: google_map,
 			zIndex: 2
 		});
-	}
+	google.maps.event.addListener(startPositionMarker,'click',function(){showAddressBar();});
+	google.maps.event.addListener(startPositionMarker,'dragstart',function(){showAddressBar();});
+	google.maps.event.addListener(startPositionMarker,'dragend',function(){
+		var pos = startPositionMarker.getPosition();
+		var slat = pos.lat();
+		var slng = pos.lng();
+		$.ajax({
+		type: 'GET',
+		dataType : 'json',
+		url: 'http://maps.googleapis.com/maps/api/geocode/json?latlng='+ slat +','+ slng +'&sensor=true',
+		beforeSend: function(){
+			
+		},
+		error: function(jqxhr,status,error){
+
+		},
+		success: function(data,status){
+			$('#addressInput').val(data.results[0].formatted_address);
+		}		
+	});
+	});
+}
+
+function showAddressBar(){
+	popupAddressOpen = true;
+	$('#popupAddress').on({
+	    popupbeforeposition: function () {
+	        $('.ui-popup-screen').remove();
+	    }
+	});
+	$('#popupAddress').popup({ positionTo: "#headerBar"});
+	$('#popupAddress').width($(window).width()*0.9);
+	$('#popupAddress').popup( "open");
 }
 
 function updatePosition(pos){
@@ -153,6 +203,9 @@ function backupMap(){
 	//console.log('Center Lat : ' + center_latitude);
 	//console.log('Center Lgn : ' + center_longitude);
 	//console.log('Zoom : ' + zoom);
+	var pos = startPositionMarker.getPosition();
+	startPositionLat = pos.lat();
+	startPositionLng = pos.lng();
 	map_type = google_map.getMapTypeId();
 }
 
@@ -311,6 +364,7 @@ function plotMapData(firsttime){
 	console.log('plotMapData');
 	startLoadingMessage('Carregando mapa...');
 	createMarker(currentPositionData,firsttime); // posição atual
+	createStartMarker(firsttime);
 	var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
 	var icones = JSON.parse(localStorage.getItem("Icones"));
 	//console.log(pontos);
@@ -323,7 +377,7 @@ function plotMapData(firsttime){
 		markers[i] = new google.maps.Marker({
 			title: pontos[i][1],
 			position: new google.maps.LatLng(parseFloat(pontos[i][3]),parseFloat(pontos[i][4])),
-			icon: {url: icone, scaledSize: new google.maps.Size(46,54)},
+			icon: {url: icone},
 			map: google_map
 		});
 		console.log(markers[i]);
@@ -357,10 +411,10 @@ function infoWindowContent(pontos,i){
 	//'<div style="margin: 0 auto; text-align: center; cursor: pointer;"><a href="https://maps.google.com.br/?z=12&layer=c&cbll='+ pontos[i][3]+','+ pontos[i][4] + '&cbp=0" target="_blank"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></a></div>' +
 	'<div style="margin: 0 auto; text-align: center; cursor: pointer;" onclick="streetViewClick('+pontos[i][3]+','+ pontos[i][4] +');"><img src="http://maps.googleapis.com/maps/api/streetview?size=300x100&location='+ pontos[i][3]+','+ pontos[i][4] + '&sensor=false&key=AIzaSyC005bo2oNiOfRJL9otrVZS2jL4Ola2p5o" /></div>' +
 	'<fieldset class="ui-grid-b">' +
-	//'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
-    '<div class="ui-block-a"><div class="infobutton rota-button" onclick="rotaClick('+ pontos[i][3] +','+ pontos[i][4] +');"><img src="imgs/rota.png" width="30px" height="30px"/><br>ROTA</div></div>' +
-    '<div class="ui-block-b">'+ (pontos[i][15] != '' ? ('<a href="'+pontos[i][15]+'" style="text-decoration: none;" target="_blank">') : '') +'<div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/site.png" width="30px" height="30px"/><br>SITE</div>'+ (pontos[i][15] != '' ? ('</a>') : '')+'</div>' +
-    '<div class="ui-block-c">'+ (pontos[i][12] != '' ? ('<a href="tel:'+pontos[i][12]+'" style="text-decoration: none;" target="_blank">') : '') +'<div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/telefone.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'TELEFONE') +'</div>'+ (pontos[i][12] != '' ? ('</a>') : '')+'</div>' + 
+	//'<div class="ui-block-a"><a href="'+url_rota+'" style="text-decoration: none;" target="_blank"><div class="infobutton"><img src="imgs/icon_rota.png" width="30px" height="30px"/><br>Rota</div></a></div>' +
+    '<div class="ui-block-a"><div class="infobutton rota-button" onclick="rotaClick('+ pontos[i][3] +','+ pontos[i][4] +');"><img src="imgs/icon_rota.png" width="30px" height="30px"/><br>ROTA</div></div>' +
+    '<div class="ui-block-b">'+ (pontos[i][15] != '' ? ('<a href="'+pontos[i][15]+'" style="text-decoration: none;" target="_blank">') : '') +'<div class="infobutton'+ (pontos[i][15] != '' ? '' : '-disabled') +'"><img src="imgs/icon_web.png" width="30px" height="30px"/><br>SITE</div>'+ (pontos[i][15] != '' ? ('</a>') : '')+'</div>' +
+    '<div class="ui-block-c">'+ (pontos[i][12] != '' ? ('<a href="tel:'+pontos[i][12]+'" style="text-decoration: none;" target="_blank">') : '') +'<div class="infobutton'+ (pontos[i][12] != '' ? '' : '-disabled') +'"><img src="imgs/icon_call.png" width="30px" height="30px"/><br>'+ (pontos[i][12] != '' ? pontos[i][12] : 'TELEFONE') +'</div>'+ (pontos[i][12] != '' ? ('</a>') : '')+'</div>' + 
     '</fieldset><div class="fb-comments" data-href="http://www.lupah.org/?id='+ i +'" data-width="300"></div>';
 	return contentInfo;
 };
@@ -389,6 +443,56 @@ function criarMapa(){
 		center : new google.maps.LatLng(center_latitude != null ? center_latitude : def_center_latitude , center_longitude != null ? center_longitude : def_center_longitude),
 		mapTypeId : map_type != null ? map_type : google.maps.MapTypeId.ROADMAP
 	});
+	var input = document.getElementById('addressInput');
+	var autocomplete = new google.maps.places.Autocomplete(input);
+	 autocomplete.bindTo('bounds', google_map);
+	 autocomplete.setTypes(['geocode']);
+	//$('#popupAddress-popup').css('z-index','999');
+	//$('.pac-container').css('z-index','2000');
+
+  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    var place = autocomplete.getPlace();
+    if (!place.geometry) {
+      // Inform the user that the place was not found and return.
+      return;
+    }
+
+    // If the place has a geometry, then present it on a map.
+    if (place.geometry.viewport) {
+      google_map.fitBounds(place.geometry.viewport);
+    } else {
+      google_map.setCenter(place.geometry.location);
+      google_map.setZoom(15);  // Why 17? Because it looks good.
+    }
+    startPositionMarker.setPosition(place.geometry.location);
+
+    var address = '';
+    if (place.address_components) {
+      address = [
+        (place.address_components[0] && place.address_components[0].short_name || ''),
+        (place.address_components[1] && place.address_components[1].short_name || ''),
+        (place.address_components[2] && place.address_components[2].short_name || '')
+      ].join(' ');
+    }
+  });
+  
+	 
+	google.maps.event.addListener(google_map,'click',function(){
+		$('#popupAddress').popup("close");
+		popupAddressOpen = false;
+		infoBubble.close();
+	});
+	google.maps.event.addListener(google_map,'dragstart',function(){
+		$('#popupAddress').popup("close");
+		popupAddressOpen = false;
+	});
+}
+var pacInit = false;
+function pacTest(){
+	if(!pacInit){
+		pacInit = true;
+		$('.pac-container').css('z-index','1666');
+	}
 }
 
 function getRealContentHeight() {
@@ -412,6 +516,7 @@ function getRealContentHeight() {
 }
 
 function searchByName(nameTextInput){
+	console.log('searching');
   var icones = JSON.parse(localStorage.getItem('Icones'));
   var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
   var j = 0;
@@ -453,4 +558,14 @@ function resultSelection_onClick(liElement){
       $('#resultSelection').popup({ theme: "a" });
       theme_Class = 'solid';
     }
+}
+
+function centerPosButton(){
+	var posLatLng = new google.maps.LatLng(currentPositionData.coords.latitude,currentPositionData.coords.longitude);
+	google_map.panTo(posLatLng);
+	google_map.setZoom(15);
+}
+function centerStartButton(){
+	google_map.panTo(startPositionMarker.getPosition());
+	google_map.setZoom(15);
 }
