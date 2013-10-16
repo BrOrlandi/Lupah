@@ -515,50 +515,6 @@ function getRealContentHeight() {
 	return content_height;
 }
 
-function searchByName(nameTextInput){
-	console.log('searching');
-  var icones = JSON.parse(localStorage.getItem('Icones'));
-  var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
-  var j = 0;
-   
-    $('#resultsList').empty(); // empties resultsList (because of the last insertion)
-  
-  for(var i = 0; i < pontos.length && nameTextInput.value.length > 1; i++){ // only starts searching if the word has more than 2 letters
-     if(pontos[i][1].toLowerCase().indexOf(nameTextInput.value.toLowerCase()) != -1){
-       
-       $('#resultsList').append('<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#">' + pontos[i][1] + '</a></li>');
-    }
-  }  
-  
-  $("#resultsList").listview("refresh");
-  $('#resultSelection').popup({ theme: "a" });
-     
-     theme_Class = 'solid';
-}
-
-
-function resultSelection_onClick(liElement){
-  if(theme_Class === 'solid'){
-    $('#resultSelection').popup({ theme: "none" });
-    theme_Class = 'translucent';
-      var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
-      google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
-      google_map.setZoom(13);
-      /*
-      if(infoBubble == undefined){
-        window.alert('infowindow');
-        infoBubble = new google.maps.InfoWindow();
-      }*/
-     
-	var contentInfo = infoWindowContent(pontos,liElement.value); 
-          
-    infoBubble.setContent(contentInfo);
-    infoBubble.open(google_map, markers[liElement.value]);
-    }else{
-      $('#resultSelection').popup({ theme: "a" });
-      theme_Class = 'solid';
-    }
-}
 
 function centerPosButton(){
 	var posLatLng = new google.maps.LatLng(currentPositionData.coords.latitude,currentPositionData.coords.longitude);
@@ -568,4 +524,104 @@ function centerPosButton(){
 function centerStartButton(){
 	google_map.panTo(startPositionMarker.getPosition());
 	google_map.setZoom(15);
+}
+
+function searchBtn_OnClick(){
+
+  if($('#resultsList').length == 0){	
+	 var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
+  	 var j = 0;
+	 var content = []; 
+	 
+     for(var i = 0; i < pontos.length; i++){ // only starts searching if the word has more than 2 letters
+  			content[i] = '<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#" data>' + pontos[i][1] + '</a></li>';
+     }	
+ 	
+	// $listview.children(':visible').not().show();
+	 
+	 $('<ul/>',{'id':'resultsList','data-role':'listview', 'data-filter-placeholder':'Procurar locais...','data-inset':true, 'data-filter-reveal':true, 'data-filter':true}).appendTo( '#popupBasic' );
+     $.each(content, function(i,v) { $('<li/>').html( v ).appendTo( '#popupBasic ul' ); });
+	
+	 $('#popupBasic').trigger('create');
+	 
+	 //$("#mapcontent").css('position', 'fixed');
+  }
+}
+
+function resultSelection_onClick(liElement){
+
+	    $("#popupBasic").popup('close');
+    
+		var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+	    google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
+    	google_map.setZoom(13);
+    	if(infowindow == undefined){
+			infowindow = new google.maps.InfoWindow();
+    	}
+ 
+    	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[liElement.value][3]+','+ pontos[liElement.value][4];
+	    	
+    	var contentInfo = '<div id="content"><h2>'+ pontos[liElement.value][1] + '</h2><p>Tipo: ' + pontos[liElement.value][2] + '<br><br>' + pontos[liElement.value][13] + '</p>'+
+    	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
+   		'<a href="'+pontos[liElement.value][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
+   		'<a href="tel:'+pontos[liElement.value][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[liElement.value][12] +'</a>  ' + 
+   		'</div>';
+					
+		infowindow.setContent(contentInfo);
+		infowindow.open(google_map, markers[liElement.value]);
+    
+}
+
+function boxclick(box) {
+        if (box.checked) {
+          show();
+        } else {
+          hide();
+        }
+      }
+      
+function show() {
+	   var elementos = document.getElementsByName('checkbox');
+	   var index;
+	   var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+       for (var i = 0; i < pontos.length; i++) {
+         for(var j = 0; j < elementos.length; j++){
+           if(elementos[j].checked && (index = pontos[i][2].toUpperCase().indexOf(elementos[j].getAttribute('class').toUpperCase())) != -1) {
+             console.log('i: ' + i + 'setVisible: ' + pontos[i][1] + ' index: ' + index);
+             markers[i].setVisible(true);
+         }else if(!elementos[j].checked  && (index = pontos[i][2].toUpperCase().indexOf(elementos[j].getAttribute('class').toUpperCase())) != -1){
+         	console.log('i: ' + i + 'setInvisible: ' + pontos[i][1] + ' index: ' + index);
+            markers[i].setVisible(false);
+         }
+       }
+      }
+}
+function hide() {
+	   var elementos = document.getElementsByName('checkbox');
+	   var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+       
+       if(checkedCount(elementos)!=0){
+        for (var i = 0; i < pontos.length; i++) {
+          for(var j = 0; j < elementos.length; j++){
+            if(!elementos[j].checked && pontos[i][2].toUpperCase().indexOf(elementos[j].getAttribute('class').toUpperCase()) != -1) {
+              console.log('setVisible');
+              markers[i].setVisible(false);
+          }
+         }
+       }
+      }else{
+      	for(var i = 0; i < pontos.length; i++){
+      		markers[i].setVisible(true);
+      	}
+      }
+}
+
+function checkedCount(elements){
+	var count = 0;
+	for(var i = 0; i < elements.length; i++){
+		if(elements[i].checked){
+		   count++;	
+		}
+	}
+	return count;
 }

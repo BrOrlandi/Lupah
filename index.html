@@ -71,18 +71,53 @@
         </div>
 
         <div data-theme="a" data-role="footer" data-position="fixed" data-id="footer" id="footerBar" class="ui-bar">
-            <a href="#popupBasic" data-rel="popup">Pesquisar</a>
-            <div data-role="popup" id="popupBasic" data-transition="slideup" class="ui-content" data-overlay-theme="a">
+            <a href="#popupBasic" data-position-to="#dialogo"  data-rel="popup" onclick="searchBtn_OnClick()" >Pesquisar</a>
+ 			    <div data-role="popup" id="popupBasic" data-transition="slideup" class="ui-content" data-overlay-theme="none" data-transition="slidedown" style="{height: 300;}">
+  						
+			     </div>
+			   
+		    	
+			<a href="#filterByType" data-rel="popup">Filtrar</a>
+			<div data-role="popup" id="filterByType" data-transition="slideup" class="ui-content" data-overlay-theme="a" onbeforeactivate="loadList()">
+			    <div data-role="fieldcontain">
+			      <fieldset id="filterByTypeList" data-role="controlgroup" >
+					<input type="checkbox" name="checkbox" class='UBS' name="checkbox-1a" id="checkbox-1a" onclick="boxclick(this)"/>
+					<label for="checkbox-1a">UBS</label>
+	
+					<input type="checkbox" name="checkbox" class='H2' name="checkbox-2a" id="checkbox-2a" onclick="boxclick(this)"/>
+					<label for="checkbox-2a">H2</label>
+	
+	 				<input type="checkbox" name="checkbox" class='Doacao de Sangue' name="checkbox-3a" id="checkbox-3a" onclick="boxclick(this)"/>
+					<label for="checkbox-3a">Doação de Sangue</label>
+	
+					<input type="checkbox" name="checkbox" class='AMA' name="checkbox-4a" id="checkbox-4a" onclick="boxclick(this)"/>
+					<label for="checkbox-4a">AMA</label>
+	
+					<input type="checkbox" name="checkbox" class='H3' name="checkbox-5a" id="checkbox-5a" onclick="boxclick(this)"/>
+					<label for="checkbox-5a">H3</label>
+	
+					<input type="checkbox" name="checkbox" class='Clinica' name="checkbox-6a" id="checkbox-6a" onclick="boxclick(this)"/>
+					<label for="checkbox-6a">Clínica</label>
+	
+	                <input type="checkbox" name="checkbox" class='HP' name="checkbox-7a" id="checkbox-7a" onclick="boxclick(this)"/>
+					<label for="checkbox-7a">HP</label>
+	 
+					<input type="checkbox" name="checkbox" class='PS' name="checkbox-8a" id="checkbox-8a" onclick="boxclick(this)"/>
+					<label for="checkbox-8a">PS</label>
 
-                <input id="searchTextInput" type="search" style="border-left-width: 20px; border-right-width: 20px" onkeyup="searchByName(searchTextInput)">
-                </input>
-                <div data-role="button" data-inline="true" style="{margin: 30px}">
-                    <a href="#resultSelection" data-rel="popup"> Pesquisar </a>
-                </div>
-                <div data-transition="slideup" data-role="popup" id="resultSelection" class="ui-content" onclick="resultSelection_OnClick()">
-                    <ul id="resultsList" data-role="listview" data-theme="g"></ul>
-                </div>
-            </div>
+ 					<input type="checkbox" name="checkbox" class='UPA' name="checkbox-9a" id="checkbox-9a" onclick="boxclick(this)"/>
+					<label for="checkbox-9a">UPA</label>
+	
+					<input type="checkbox" name="checkbox" class='CAPS' name="checkbox-10a" id="checkbox-10a" onclick="boxclick(this)"/>
+					<label for="checkbox-10a">CAPS</label>
+					
+					<input type="checkbox" name="checkbox" class='CEO' name="checkbox-11a" id="checkbox-11a" onclick="boxclick(this)"/>
+					<label for="checkbox-11a">CEO</label>
+	 
+	 	 
+			      </fieldset>
+			    </div>
+			</div>
             
             <div data-role="popup" id="popupAddress" style="padding: 5px 10px;" data-transition="slidedown" class="ui-content">
                 <input id="addressInput" type="text" onkeyup="pacTest()">
