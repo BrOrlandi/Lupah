@@ -44,7 +44,8 @@ getMetadataOnline();
 
 $(document).on('pageshow', '#map_page', function(e, data) {
 				
-	$('#map_canvas').css('height', getRealContentHeight());
+	var h = getRealContentHeight();
+	$('#map_canvas').css('height', h);
 	criarMapa();
 	startWatchPosition();
 });
@@ -128,13 +129,12 @@ function createMarker(pos,firsttime){
 	}
 	var posLatLng = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
 	currentPositionMarker = new google.maps.Marker({
-			animation: firsttime == true ? google.maps.Animation.DROP : null,
 			title: 'Você',
 			position: posLatLng,
 			//icon: {fillColor: '#294aa5', strokeColor: '#00cbff', scale: 10, strokeWeight: 10, fillOpacity: 1, strokeOpacity: 0.5, path: google.maps.SymbolPath.CIRCLE},
 			icon: {url: './imgs/icon_localatual2.png', anchor: {x:18,y:18}},
 			map: google_map,
-			zIndex: 1
+			zIndex: 2
 		});
 	if(firsttime){
 		google_map.panTo(posLatLng);
@@ -144,8 +144,14 @@ function createMarker(pos,firsttime){
 
 function createStartMarker(firsttime){
 	if(firsttime){
-		startPositionLat = currentPositionData.coords.latitude;
-		startPositionLng = currentPositionData.coords.longitude;
+		if(currentPositionData != null){
+			startPositionLat = currentPositionData.coords.latitude;
+			startPositionLng = currentPositionData.coords.longitude;
+		}else
+		{
+			startPositionLat = def_center_latitude;
+			startPositionLng = def_center_longitude;
+		}
 	}
 	startPositionMarker = new google.maps.Marker({
 			animation: firsttime == true ? google.maps.Animation.DROP : null,
@@ -154,7 +160,7 @@ function createStartMarker(firsttime){
 			icon: {url: './imgs/icon_partida2.png', anchor: {x:28,y:67}, scaledSize: new google.maps.Size(57,67)},//, scaledSize: new google.maps.Size(50,50)
 			draggable: true,
 			map: google_map,
-			zIndex: 2
+			zIndex: 3
 		});
 	google.maps.event.addListener(startPositionMarker,'click',function(){showAddressBar();});
 	google.maps.event.addListener(startPositionMarker,'dragstart',function(){showAddressBar();});
@@ -181,8 +187,8 @@ function createStartMarker(firsttime){
 
 function showAddressBar(){
 	popupAddressOpen = true;
-	$('#popupAddress').on({
-	    popupbeforeposition: function () {
+	$('#popupAddress').popup({
+	    beforeposition: function () {
 	        $('.ui-popup-screen').remove();
 	    }
 	});
@@ -191,6 +197,7 @@ function showAddressBar(){
 	$('#popupAddress').popup({ positionTo: "#dialogo"});
 	$('#popupAddress').width($(window).width()*0.9);
 	$('#popupAddress').popup( "open");
+	
 }
 
 function updatePosition(pos){
@@ -369,7 +376,9 @@ function plotMapData(firsttime){
 	console.log('plotMapData');
 	startLoadingMessage('Carregando mapa...');
 	createMarker(currentPositionData,firsttime); // posição atual
+	//console.log('Criou o marcador da posição atual');
 	createStartMarker(firsttime);
+	//console.log('Criou o marcador de partida');
 	pontosMapa = JSON.parse(localStorage.getItem("PontosMapa"));
 	iconesMapa = JSON.parse(localStorage.getItem("Icones"));
 	//console.log(pontos);
@@ -388,10 +397,9 @@ function plotMapData(firsttime){
 			icon: {url: icone},
 			map: google_map
 		});
-		console.log(markers[i]);
+		//console.log(markers[i]);
 	
-    	var contentInfo = infoWindowContent(pontosMapa,i); 	
-    	      
+    	var contentInfo = infoWindowContent(pontosMapa,i); 	   
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
 				//infowindow.setContent(content);
@@ -405,16 +413,19 @@ function plotMapData(firsttime){
 			
 		// adiciona na lista:
 		$('#searchList').append('<li onclick="resultSelection_onClick('+i+')"><a href="#">'+ pontosMapa[i][1] +'</a></li>');
+		//console.log('Adicionou o ponto '+ pontosMapa[i][1] + ' na lista');
 	}
 	$('#searchList').listview('refresh'); // atualiza a lista depois de inserir dados.
+	//console.log('Atualiza dados da lista.');
 	$('input[data-type="search"]').val('');
 	$('input[data-type="search"]').trigger("keyup");
+	//console.log('Limpa busca');
 	stopLoadingMessage();
 	console.log('end of plotMapData, '+ pontosMapa.length + ' points.');
 }
 
 function infoWindowContent(pontos,i){
-	console.log('infoWindowContent!');
+	//console.log('infoWindowContent!');
 		//var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
     	//					'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
     	
@@ -495,7 +506,8 @@ function criarMapa(){
 		$('input[data-type="search"]').val('');
 		$('input[data-type="search"]').trigger("keyup");
 		$('#popupAddress').popup("close");
-		$('#popupBasic').popup("close");
+		$('#popupSearch').popup("close");
+		$('#popupFilter').popup("close");
 		popupAddressOpen = false;
 		//infoBubble.close();
 	});
@@ -503,7 +515,8 @@ function criarMapa(){
 		$('input[data-type="search"]').val('');
 		$('input[data-type="search"]').trigger("keyup");
 		$('#popupAddress').popup("close");
-		$('#popupBasic').popup("close");
+		$('#popupSearch').popup("close");
+		$('#popupFilter').popup("close");
 		popupAddressOpen = false;
 	});
 }
@@ -537,7 +550,6 @@ function getRealContentHeight() {
 	return content_height;
 }
 
-
 function centerPosButton(){
 	var posLatLng = new google.maps.LatLng(currentPositionData.coords.latitude,currentPositionData.coords.longitude);
 	google_map.panTo(posLatLng);
@@ -550,45 +562,17 @@ function centerStartButton(){
 	$('#partidaButton').removeClass('ui-btn-active');
 }
 
-function searchBtn_OnClick(){
-	/*
-	if(!searchListFilled){
-		$('#searchList').html('');
-		for
-	}
-*/
-  	/*
-  if($('#resultsList').length == 0){	
-	 var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
-	 var content = []; 
-	 
-     for(var i = 0; i < pontos.length; i++){ // only starts searching if the word has more than 2 letters
-  			content[i] = '<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#" data>' + pontos[i][1] + '</a></li>';
-     }	
- 	
-	// $listview.children(':visible').not().show();
-	 
-	 $('<ul/>',{'id':'resultsList','data-role':'listview', 'data-filter-placeholder':'Procurar locais...','data-inset':true, 'data-filter-reveal':true, 'data-filter':true}).appendTo( '#popupBasic' );
-     $.each(content, function(i,v) { $('<li/>').html( v ).appendTo( '#popupBasic ul' ); });
-	
-	 //$('#popupBasic').trigger('create');
-	 
-	 //$("#mapcontent").css('position', 'fixed');
-  }
-  */
-}
-
 function resultSelection_onClick(index){
 
-	    $("#popupBasic").popup('close');
-    
-	    google_map.panTo(new google.maps.LatLng(pontosMapa[index][3] , pontosMapa[index][4]));
-    	google_map.setZoom(13);
-    	
-    	var contentInfo = infoWindowContent(pontosMapa,index); 	 
+    $("#popupSearch").popup('close');
 
-		infoBubble.setContent(contentInfo);
-		infoBubble.open(google_map, markers[index]);
+    google_map.panTo(new google.maps.LatLng(pontosMapa[index][3] , pontosMapa[index][4]));
+	google_map.setZoom(13);
+	
+	var contentInfo = infoWindowContent(pontosMapa,index); 	 
+
+	infoBubble.setContent(contentInfo);
+	infoBubble.open(google_map, markers[index]);
     
 }
 
@@ -645,3 +629,50 @@ function checkedCount(elements){
 	}
 	return count;
 }
+
+var searchOpen = false;
+
+function searchPopupOpen(){
+	$('#popupSearch').popup({
+		afteropen: function(){
+			searchOpen = true;
+		},
+		afterclose: function(){
+			searchOpen = false;			
+		}
+	});
+	searchPopupSize();
+}
+
+function searchPopupSize(){
+	var h = getRealContentHeight();
+	var pad = parseInt($('#popupSearch').css('padding-top'));
+	pad += parseInt($('#popupSearch').css('padding-bottom'));
+	var total = h - pad;
+	$('#searchList').css('max-height', total);
+	//console.log('Altura h : ' +h);
+	//console.log('Padding popup: ' +pad);
+	//console.log('Search list height: '+total);
+}
+
+function filterPopupOpen(){
+	$('#popupFilter').popup({
+		beforeposition: function () {
+	        $('.ui-popup-screen').remove();
+	    }
+	});
+	var h = getRealContentHeight();
+	var pad = parseInt($('#popupFilter').css('padding-top'));
+	pad += parseInt($('#popupFilter').css('padding-bottom'));
+	var total = h - pad;
+	$('#filterList').css('max-height', total);
+	console.log('Altura h : ' +h);
+	console.log('Padding popup: ' +pad);
+	//console.log('Filter list height: '+total);
+}
+
+$(window).resize(function(e){
+	if(searchOpen){
+		searchPopupSize();
+	}
+});

@@ -166,3 +166,7 @@ text-shadow: none;}
 	text-shadow:1px 1px 0px #ffffff;
 	padding: 15px;
 }
+
+.scrollable {
+    overflow-y: scroll;
+}
